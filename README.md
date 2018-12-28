@@ -6,7 +6,7 @@ The goal of this repo is to gather all the resources that I've used for this cou
 
 ## Table of Contents
 - Course notes
-- Algorithms from the course
+- [Algorithms from the course](algorithms_notes.md)
 - Fine-tuning 
 - [Papers from the course](papers_from_course.md)
 - [Interesting papers](interesting_papers.md)
