@@ -1,6 +1,6 @@
 # PyTorch Challenge Scholarship 2018-19
 
-![PyTorch Logo](https://github.com/masterflorin/PyTorchChallengeScholarship2018-19/blob/master/pytorch-logo.png)
+![PyTorch Logo](https://github.com/pytorch/pytorch/blob/master/docs/source/_static/img/pytorch-logo-dark.png)
 
 The goal of this repo is to gather all the resources that I've used for this course.
 
