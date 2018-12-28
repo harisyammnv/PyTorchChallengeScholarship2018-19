@@ -1,6 +1,6 @@
 # PyTorch Challenge Scholarship 2018-19
 
-![PyTorch Logo](https://github.com/masterflorin/PyTorchChallengeScholarship2018-19/pytorch-logo.png)
+![PyTorch Logo](https://github.com/masterflorin/PyTorchChallengeScholarship2018-19/blob/master/pytorch-logo.png)
 
 The goal of this repo is to gather all the resources that I've used for this course.
 
@@ -10,6 +10,7 @@ The goal of this repo is to gather all the resources that I've used for this cou
 - Fine-tuning 
 - Papers from the course
 - Interesting papers
+- Published materials for the community
 - Other resources
 
 
