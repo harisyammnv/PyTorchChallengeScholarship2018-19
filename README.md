@@ -6,10 +6,10 @@ The goal of this repo is to gather all the resources that I've used for this cou
 
 ## Table of Contents
 - Course notes
-- Implemented algorithms from the course
+- Algorithms from the course
 - Fine-tuning 
-- Papers from the course
-- Interesting papers
+- [Papers from the course](papers_from_course.md)
+- [Interesting papers](interesting_papers.md)
 - Published materials for the community
 - Other resources
 
