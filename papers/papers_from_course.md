@@ -10,7 +10,9 @@ First paper on [dropout](https://www.cs.toronto.edu/~hinton/absps/JMLRdropout.pd
 
 ### Lesson 5.40
 AlexNet [paper](http://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf)
+
 VGG [paper](https://arxiv.org/pdf/1409.1556.pdf)
+
 ResNet [paper](https://arxiv.org/pdf/1512.03385v1.pdf)
 
 ### Lesson 5.41
@@ -29,6 +31,7 @@ Image Style Transfer Using Convolutional Neural Networks[paper](https://www.cv-f
 
 ### Lesson 9.7
 Efficient Estimation of Word Representations in Vector Space. [Word2Vec paper](https://arxiv.org/pdf/1301.3781.pdf)
+
 Unsupervised Representation Learning with Deep Convolutional Generative Adversarial Networks. [DCGANs paper](https://arxiv.org/pdf/1511.06434.pdf)
 
 
