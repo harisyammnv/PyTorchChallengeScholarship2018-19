@@ -1,9 +1,8 @@
-'''Code snipptes on how to unfreeze and train specific layers'''
+'''Code snippets on how to unfreeze and train specific layers'''
 
 ### How to import a pretrained model from torchvision
 import torchvision.models as models
 model = models.resnet152()
-
 
 ### How to train the last layer only (classifier)
 for param in model.parameters():

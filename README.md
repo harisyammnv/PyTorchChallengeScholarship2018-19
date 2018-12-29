@@ -5,9 +5,9 @@
 The goal of this repo is to gather all the resources that I've used for this course.
 
 ## Table of Contents
-- Course notes
-- [Algorithms from the course](/blob/master/algorithms/algorithms_notes.md)
-- [Fine-tuning ](/blob/master/fine_tuning/fine_tuning.md)
+- [Course notes]
+- [Algorithms from the course](algorithms/algorithms_notes.md)
+- [Fine-tuning ](fine_tuning/fine_tuning.md)
 - [Papers from the course](papers_from_course.md)
 - [Interesting papers](interesting_papers.md)
 - Published materials for the community
