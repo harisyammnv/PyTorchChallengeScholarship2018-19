@@ -25,5 +25,13 @@ for name, child in model.named_children():
       for param in child.parameters():
           param.requires_grad = True
 
-#In order to make it work during training you'll also have to adjust your optimizer such as below
+### In order to make it work during training you'll also have to adjust your optimizer such as below
 optimizer = torch.optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=0.0006, momentum=0.9, nesterov=True)
+
+### After training, you can find out how many total parameters and training parameters, this can give you a rough size
+### of how big your model is
+total_params = sum(p.numel() for p in model.parameters())
+print(f'{total_params:,} total parameters.')
+total_trainable_params = sum(
+    p.numel() for p in model.parameters() if p.requires_grad)
+print(f'{total_trainable_params:,} training parameters.')
