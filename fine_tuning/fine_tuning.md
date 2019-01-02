@@ -12,7 +12,7 @@ Here are some questions:
 
 1. Am I doing enough Data Augmentation? Am I doing too much? Is this is an imbalanced Dataset, how do we adjust it?
 
-2. Why am I sticking with only Adam or SGD optimizers? Are there any more Optimizers to try out? (Yes there are check them out for e.g: [Stochastic Gradient Descent with Restarts] (https://medium.com/38th-street-studios/exploring-stochastic-gradient-descent-with-restarts-sgdr-fa206c38a74e), [More on SGDR] (https://towardsdatascience.com/https-medium-com-reina-wang-tw-stochastic-gradient-descent-with-restarts-5f511975163))
+2. Why am I sticking with only Adam or SGD optimizers? Are there any more Optimizers to try out? (Yes there are check them out for e.g: [Stochastic Gradient Descent with Restarts](https://medium.com/38th-street-studios/exploring-stochastic-gradient-descent-with-restarts-sgdr-fa206c38a74e), [More on SGDR](https://towardsdatascience.com/https-medium-com-reina-wang-tw-stochastic-gradient-descent-with-restarts-5f511975163))
 
 3. Should the classifier layers consists of Linear and Dropouts? Can we add BatchNorm1d? Can we add Special Pooling layers? [Adaptive Avg Pool](https://forums.fast.ai/t/ideas-behind-adaptive-max-pooling/12634)
 
