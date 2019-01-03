@@ -11,12 +11,11 @@ From **[@Harry007](https://github.com/harisyammnv)** from slack channel with add
 
 3. Why am I sticking with only Adam or SGD optimizers? Are there any more Optimizers to try out? (Yes there are check them out for e.g: Stochastic Gradient Descent with Restarts)
 
-4. Should the classifier layers consists of Linear and Dropouts? Can we add BatchNorm1d? Can we add Special Pooling layers?
+2. Why am I sticking with only Adam or SGD optimizers? Are there any more Optimizers to try out? (Yes there are check them out for e.g: [Stochastic Gradient Descent with Restarts](https://medium.com/38th-street-studios/exploring-stochastic-gradient-descent-with-restarts-sgdr-fa206c38a74e), [More on SGDR](https://towardsdatascience.com/https-medium-com-reina-wang-tw-stochastic-gradient-descent-with-restarts-5f511975163))
 
-5. What about the Learning Rate schedulers? Are there any new LR schedulers? e.g. Cyclic LR scheduler
-	- How to adjust the Learning rate in [PyTorch](https://pytorch.org/docs/master/optim.html#how-to-adjust-learning-rate)
+3. Should the classifier layers consists of Linear and Dropouts? Can we add BatchNorm1d? Can we add Special Pooling layers? [Adaptive Avg Pool](https://forums.fast.ai/t/ideas-behind-adaptive-max-pooling/12634)
 
-6. Try to unfreeze the layers gradually and everytime experiment with 2 to 4 different learning rates everytime you unfreeze a block or a layer ([Differential Learning rates](https://discuss.pytorch.org/t/different-learning-rates-within-a-model/1307) )
+4. What about the Learning Rate schedulers? Are there any new LR schedulers? e.g. [CyclicLR scheduler](https://github.com/thomasjpfan/pytorch/blob/401ec389db2c9d2978917a6e4d1101b20340d7e7/torch/optim/lr_scheduler.py) 
 
 7. Use advanced regularization techniques like weight decay and if you are using SGD try to change the momentum values (Momentum Correction)
 
