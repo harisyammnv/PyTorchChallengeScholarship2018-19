@@ -4,9 +4,13 @@ Resources/links
 https://github.com/masterflorin/PyTorchChallengeScholarship2018-19/blob/master/fine_tuning/fine_tuning.md
 https://towardsdatascience.com/estimating-optimal-learning-rate-for-a-deep-neural-network-ce32f2556ce0
 [1] https://arxiv.org/abs/1506.01186
-
-
-
+[2] https://www.jeremyjordan.me/nn-learning-rate/
+[3] https://github.com/fastai/fastai/blob/master/old/fastai/learner.py
+[4] https://github.com/pytorch/pytorch/pull/2016
+[5] https://github.com/thomasjpfan/pytorch/blob/401ec389db2c9d2978917a6e4d1101b20340d7e7/torch/optim/lr_scheduler.py
+[6] https://github.com/pytorch/pytorch/issues/3790
+[7] https://github.com/allenai/allennlp/issues/1642
+[8] https://pytorch.org/docs/stable/optim.html#torch.optim.lr_scheduler.CosineAnnealingLR
 
 ## Workflow
 
@@ -16,13 +20,13 @@ Then we mention the first step we state the problem of not reaching an accuracy 
 Propose food for thought, and provide some examples from the repo and other resources
 1) Data Augmentation
 2) Learning rate
-3) How should my classifier look like?
-	- Why only Linear and Dropout layers in Classifiers?
-		- We could add special Pooling layers and also Use BatchNorm1d
-4) Optimizers
-5) How to deal with the Learning Rate? 
+3) How to deal with the Learning Rate after Unfreezing the Conv layers? 
 	- How small should it be?
 	- Use a scheduler to save yourself from doing everything manually
+4) How should my classifier look like?
+	- Why only Linear and Dropout layers in Classifiers?
+		- We could add special Pooling layers and also Use BatchNorm1d
+5) Optimizers
 6) Unfreezing layers selectively and gradually (copied the explanation below should refactor it)
 7) Regularization - Weight Decay
 8) Final considerations
@@ -71,13 +75,13 @@ If the learning rate is too small - training is more reliable, but optimization 
 If the learning rate is too big - then training may not converge or even diverge. Weight changes can be so big that the optimizer overshoots the minimum and makes the loss worse. 
 Picture to show the overshoot
 
-Best Approach to resolve this issue: Start from a Larger learning rate and gradually reduce them to smaller values or start from smaller and increase gradually...therefore making the optimizer reach its global minima. This approach is outlined in [1] and is implemented in fast.ai library (higher level API on PyTorch). We are just showing the usage of implemented function here:
+Best Approach to resolve this issue: Start from a Larger learning rate and gradually reduce them to smaller values or start from smaller and increase gradually...therefore making the optimizer reach its global minima. This approach is outlined in [1] and is implemented in fast.ai library (higher level API on PyTorch). We are just showing the usage of implemented function [3] here:
 
 ~~~ 
 learn.lr_find()
 ~~~
 
-This function would train a network starting from a low learning rate and increase the learning rate exponentially for every batch.
+**This function would train a network starting from a low learning rate and increase the learning rate exponentially for every batch.**
 2 Pictures to explain this and the selection of the learning rate….
 This process has to be repeated everytime when we unfreeze some layers of the network
 
@@ -119,6 +123,89 @@ class ClassifierNew(nn.Module):
 	
 ~~~~
 In the above example we have added AdaptiveMaxPool2d and AdaptiveAveragePool2d and flattened them out and concatenated them to form a linear layer of size 4416. Why we did this is because, The Pooling layers capture richer features in the conv layers and we need to provide them as best as possible to the Classifier so they could classifiy easily and this would also effectively reduce the number of linear layers we need. This implementation is outlined is fast.ai library, we just re-implemented it here.
+
+## 4) Learning Rate Annealing / Scheduling
+The key idea here is to iteratively reduce the learning rate after every few epochs so that the optimizer would reach global/best local optima without any huge oscillations. The most popular form of learning rate annealing is a step decay where the learning rate is reduced by some percentage after a set number of training epochs. The other common scheduler is ReduceLRonPlateau. But here we would like to highlight a new one which was highlighted in [1] and was termed as cyclic learning rates 
+A picture for the cyclic learning rate
+
+The intution behind why this learning rate annealing improves the val accuracy is outlined in [2]. An exemplary cyclicLR class is taken from [4] & [5] and is given below:
+
+~~~
+def cyclical_lr(step_sz, min_lr=0.001, max_lr=1, mode='triangular', scale_func=None, scale_md='cycles', gamma=1.):
+    """implements a cyclical learning rate policy (CLR).
+    Notes: the learning rate of optimizer should be 1
+
+    Parameters:
+    ----------
+    mode : str, optional
+        one of {triangular, triangular2, exp_range}. 
+    scale_md : str, optional
+        {'cycles', 'iterations'}.
+    gamma : float, optional
+        constant in 'exp_range' scaling function: gamma**(cycle iterations)
+    
+    Examples:
+    --------
+    >>> # the learning rate of optimizer should be 1
+    >>> optimizer = optim.SGD(model.parameters(), lr=1.)
+    >>> step_size = 2*len(train_loader)
+    >>> clr = cyclical_lr(step_size, min_lr=0.001, max_lr=0.005)
+    >>> scheduler = lr_scheduler.LambdaLR(optimizer, [clr])
+    >>> # some other operations
+    >>> scheduler.step()
+    >>> optimizer.step()
+    """
+    if scale_func == None:
+        if mode == 'triangular':
+            scale_fn = lambda x: 1.
+            scale_mode = 'cycles'
+        elif mode == 'triangular2':
+            scale_fn = lambda x: 1 / (2.**(x - 1))
+            scale_mode = 'cycles'
+        elif mode == 'exp_range':
+            scale_fn = lambda x: gamma**(x)
+            scale_mode = 'iterations'
+        else:
+            raise ValueError(f'The {mode} is not valid value!')
+    else:
+        scale_fn = scale_func
+        scale_mode = scale_md
+
+    lr_lambda = lambda iters: min_lr + (max_lr - min_lr) * rel_val(iters, step_sz, scale_mode)
+
+    def rel_val(iteration, stepsize, mode):
+        cycle = math.floor(1 + iteration / (2 * stepsize))
+        x = abs(iteration / stepsize - 2 * cycle + 1)
+        if mode == 'cycles':
+            return max(0, (1 - x)) * scale_fn(cycle)
+        elif mode == 'iterations':
+            return max(0, (1 - x)) * scale_fn(iteration)
+        else:
+            raise ValueError(f'The {scale_mode} is not valid value!')
+
+    return lr_lambda
+
+optimizer = optim.SGD(model.parameters(), lr=1.)
+clr = cyclical_lr(step_size, min_lr=0.001, max_lr=1, mode='triangular2')
+scheduler = lr_scheduler.LambdaLR(optimizer, [clr])
+scheduler.step()
+optimizer.step()
+~~~
+
+## 5) Optimizer
+After using the conventional Adam/SGD we had tried a new Optimizer which was cosine Cyclic Learning Rate annealing in combination with SGD which is termed Stochastic Gradient Descent with Restarts (SGDR) which proved to be better. SGDR is an aggressive annealing schedule which is combined with periodic "restarts" to the original starting learning rate. The LRsheduler looks as the one below and we used it from the fast.ai lib [SGDR](https://github.com/fastai/fastai/blob/master/old/fastai/sgdr.py) because it still an open request [6], [7], [8]:
+
+Image
+
+In Pytorch
+~~~
+## Only Cosine Annealing here
+torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max, eta_min=0, last_epoch=-1)
+~~~
+To use this from fast.ai you just need to do as following:
+~~~
+learn.fit(lr, nr_of_epochs, cycle_len=1, cycle_mult = 2)
+~~~
 
 ## 6) Unfreezing layers selectively
 Have you ever wondered when you were at lesson 5.41 and 5.42 that you could unfreeze different layers of the model and train them again? Not? Me neither. :)
@@ -177,4 +264,8 @@ What we’re doing above is unfreezing layer stacks 3 and 4, and leaving the res
 optimizer = torch.optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=0.0006, momentum=0.9, nesterov=True)
 ~~~
 
-Insight: The reason why we mentioned not to unfreeze all the layers at once is the last conv layers are the layers which detect more richer representations in the image, since those richer repr are responsible for the classification you need to train them longer than the initial layers so this is like prioritizing ...therefore unfreeze the last conv layers/blocks train them with 10x-100x reduction of Learning rate then go to the next block reduce the LR by 10x-100x compared to the previous and then slowly move on till the starting layers
+Trick/Tip: The reason why we mentioned not to unfreeze all the layers at once is the last conv layers are the layers which detect more richer representations in the image, since those richer repr are responsible for the classification you need to train them longer than the initial layers so this is like prioritizing ...therefore unfreeze the last conv layers/blocks train them with 10x-100x reduction of Learning rate then go to the next block reduce the LR by 10x-100x compared to the previous and then slowly move on till the starting layers
+
+## 7) Weight Decay
+
+
