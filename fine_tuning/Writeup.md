@@ -182,6 +182,8 @@ torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max, eta_min=0, last_epo
 ~~~
 To use this from fast.ai you just need to do as following:
 ~~~
+learn.fit(lr, nr_of_epochs, cycle_len=1)
+# If Cycle Multipicity is needed
 learn.fit(lr, nr_of_epochs, cycle_len=1, cycle_mult = 2)
 ~~~
 
@@ -249,7 +251,17 @@ optimizer = torch.optim.SGD(filter(lambda p: p.requires_grad, model.parameters()
 **Tip/Trick**: Unfreezeing the last conv layers/blocks and training them with 10x-100x reduction of learning rate then go to the next block reduce the LR by 10x-100x compared to the previous and then slowly move on till the starting layers.
 
 ## 7) Weight Decay
+Why do we only decay the learning rate? is it also possible to decay weights? Yes it is possible by employing L1/L2 regularization to the loss function. For ex if we have a cost function `E(w)` Gradient descent tells us to modify the weights `w` in the direction of steepest descent in `E` by the formula:
+Image here
 
+But if we add L2 regularization terms to the cost function, Gradient descent on the updated cost function will lead us to a weight decay term which will penalizes large weights and effectively limits the freedom in your model. [9]
+Image here 
+
+In pytorch we could do it as below
+~~~
+# similarly for SGD as well
+torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-5)
+~~~
 
 ## Final considerations
 
@@ -264,6 +276,7 @@ optimizer = torch.optim.SGD(filter(lambda p: p.requires_grad, model.parameters()
 6. https://github.com/pytorch/pytorch/issues/3790
 7. https://github.com/allenai/allennlp/issues/1642
 8. https://pytorch.org/docs/stable/optim.html#torch.optim.lr_scheduler.CosineAnnealingLR
+9. https://stats.stackexchange.com/questions/29130/difference-between-neural-net-weight-decay-and-learning-rate
 
 ## Where to go next:
 
