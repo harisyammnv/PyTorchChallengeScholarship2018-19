@@ -18,8 +18,11 @@ From **[@Harry007](https://github.com/harisyammnv)** from slack channel with add
 4. What about the Learning Rate schedulers? Are there any new LR schedulers? e.g. [CyclicLR scheduler](https://github.com/thomasjpfan/pytorch/blob/401ec389db2c9d2978917a6e4d1101b20340d7e7/torch/optim/lr_scheduler.py) 
 
 7. Use advanced regularization techniques like weight decay and if you are using SGD try to change the momentum values (Momentum Correction)
+	- Check the [documentation](https://pytorch.org/docs/master/optim.html#torch.optim.SGD) on how to apply weight decay and momentum to SGD
+	- There is also an example in the [code snippets](unfreezing_layers.py)
 
 8. Which are the convolutional layers that bring the most value? Consider unfreezing only the last 2-3 layers, think about which layers are designed to retrieve the more complex patterns in the images.
+	- Learn how to do this by checking the [code snippets](unfreezing_layers.py).
 
 9. Whenever I unfreeze a layer how small should I reduce the learning rate? How about experimenting with reducing by a factor 10x-100x?
 
@@ -38,3 +41,4 @@ Lastly, after trying out solutions for these questions you will understand that 
 - [ ] Organize the repo into basic and more advanced tips/techniques
 - [ ] Create jupyter notebooks with specific examples and explanations on fine-tuning
 - [ ] Update file to suggest resources for fine-tuning in PyTorch
+- [ ] To add a table of contents
