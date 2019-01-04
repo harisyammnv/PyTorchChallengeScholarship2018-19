@@ -1,3 +1,5 @@
+## Draft for fine-tuning article
+
 ## Table of contents
 
 - Overview
@@ -13,7 +15,12 @@
 
 
 ## Overview
-You trained your model on let’s say 20-30 epochs with some learning using Adam or SGD as an optimizer but your accuracy on the validation set stopped at 90% or below. What do you do? How do I get to that 98% or 99% accuracy? Is that even possible? Of course it is. Both Harry and I, hit the same wall as you did and fortunately we have managed to overcome the obstacle and got the best solution. In this article, we are going to teach you how to get to those magical results. In the following paragraphs we’re going to present you some of the things that will definitely help you fine-tune your model.
+
+**Notes & Prequisites**: Before you start reading this article, we are assuming that you have already trained a pre-trained model and that you are looking for solutions on how to improve your model's ability to generalize. Harry and I focused our writing on what you could apply to the Flower Classification as the final lab challenge of the Udacity's [PyTorch Challenge Scholarship] but while this is true you could definitively learn something if you're at the beginning of your Deep Learning journey. Let's begin!
+
+Once upon a time, you trained your model on let’s say 20-30 epochs with some learning using Adam or SGD as an optimizer but your accuracy on the validation set stopped at 90% or below. What do you do? How do I get to that 98% or 99% accuracy? Is that even possible? Of course it is. Both Harry and I, hit the same wall as you did and fortunately we have managed to overcome the obstacle and 
+
+With that said, in the following paragraphs we’re going to present you some of the things that will definitely help you fine-tune your model.
 
 ADD gif with MAGIC https://giphy.com/gifs/shia-labeouf-12NUbkX6p4xOO4
 (Caption: It’s not magic though, you’ll get there through experimentation)
@@ -289,7 +296,7 @@ torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-5)
 ~~~
 
 ## Final considerations
-
+All in all, for us, this was quite a difficult topic to tackle as fine-tuning a model is a very broad and challenging topic. Most of our efforts have been directed towards the Flower Classifier application as part of the PyTorch Challenge but some of the advice will certainly help you go further than that as they are pretty general. Through this, we hope that you found this article helpful.
 
 ## Resources/links
 
