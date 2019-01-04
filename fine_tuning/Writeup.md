@@ -16,9 +16,9 @@
 
 ## Overview
 
-**Notes & Prequisites**: Before you start reading this article, we are assuming that you have already trained a pre-trained model and that you are looking for solutions on how to improve your model's ability to generalize. Harry and I focused our writing on what you could apply to the Flower Classification as the final lab challenge of the Udacity's [PyTorch Challenge Scholarship] but while this is true you could definitively learn something if you're at the beginning of your Deep Learning journey. Let's begin!
+**Notes & Prequisites**: Before you start reading this article, we are assuming that you have already trained a pre-trained model and that you are looking for solutions on how to improve your model's ability to generalize. [Harry](https://github.com/harisyammnv) and I focused our writing on what you could apply to the Flower Classification as the final lab challenge of the Udacity's [PyTorch Challenge Scholarship] but while this is true you could definitively learn something if you're at the beginning of your Deep Learning journey. Let's begin!
 
-Once upon a time, you trained your model on let’s say 20-30 epochs with some learning using Adam or SGD as an optimizer but your accuracy on the validation set stopped at 90% or below. What do you do? How do I get to that 98% or 99% accuracy? Is that even possible? Of course it is. Both Harry and I, hit the same wall as you did and fortunately we have managed to overcome the obstacle and 
+Once upon a time, you trained your model on let’s say 20-30 epochs with some learning rate and using Adam or SGD as an optimizer but your accuracy on the validation set stopped at 90% or below. What do you do from here on? How do I get to that 98% or 99% accuracy? Is that even possible? Of course it is. Both Harry and I, hit the same wall as you did and fortunately we have managed to overcome the obstacle and 
 
 With that said, in the following paragraphs we’re going to present you some of the things that will definitely help you fine-tune your model.
 
@@ -35,6 +35,7 @@ It’s obviously a tricky task to get it right so let’s think about how we cou
 
 One of the easiest ways to go about it is to work the simple transforms from PyTorch like RandomRotation or ColorJitter. We should consider adding only 1-2 transform functions at a time, the reason for this is that the dataset we are dealing with is not very complex. Moreover, starting with fewer can help us identify which one worked best.
 
+An Example: 
 ~~~
 data_transform = transforms.Compose([
     	transforms.RandomRotation(25),
@@ -47,8 +48,7 @@ If you are willing to spend some additional time on exploring different transfor
 
 ## 2) Learning Rate
 
-The learnimg rate is perhaps one of the most import hyperparameters which has to be set for enabling your deep neural network to perform better on train/val datasets 
-Generally the Deep Neural networks are trained through backprop using optimizers like Adam, Stochastic Gradient Descent, Adadelta etc. In all of these optimizers the learning rate is an input parameter and it guides the optimizer through rough terrain of the Loss function.
+The learnimg rate is perhaps one of the most import hyperparameters which has to be set for enabling your deep neural network to perform better on train/val datasets. Generally the Deep Neural networks are trained through back-propagation using optimizers like Adam, Stochastic Gradient Descent, Adadelta etc. In all of these optimizers the learning rate is an input parameter and it guides the optimizer through rough terrain of the Loss function. 
 
 The problems which the Optimizer could encounter are:
 
@@ -59,23 +59,23 @@ The problems which the Optimizer could encounter are:
 
 [Image Credit](https://www.jeremyjordan.me/nn-learning-rate/)
 
+**Best Approach to find optimal Initial Learning rate**: Start from a larger learning rate and gradually reduce them to smaller values or start from smaller and increase gradually after traversing through each mini-batch. This approach is outlined in [1](https://arxiv.org/abs/1506.01186) and is implemented in [fast.ai](https://www.fast.ai/) library (A higher level API for PyTorch). We are just showing the usage of implemented function [3](https://github.com/fastai/fastai/blob/master/old/fastai/learner.py) here:
 
-**Best Approach to find optimal Initial Learning rate**: Start from a Larger learning rate and gradually reduce them to smaller values or start from smaller and increase gradually each batch. This approach is outlined in [1] and is implemented in fast.ai library (higher level API on PyTorch). We are just showing the usage of implemented function [3] here:
 ~~~ 
 learn.lr_find()
 ~~~
-**This function would train a network starting from a low learning rate and increase the learning rate exponentially for every batch. This process has to be repeated everytime we unfreeze some layers of the network.**
 
-In the Flower Classification Dataset if we use `lr_find()` for a `densenet161` with all the layers frozen except the classifier the results look as follows:
+**More Info: This function would train a network starting from a low learning rate and increase the learning rate exponentially for every batch. This process has to be repeated everytime we unfreeze some layers of the network.**
+
+In the Flower Classification Dataset if we use `lr_find()` for a `densenet161` with all the layers frozen except the classifier the results are as follows:
 
 ![](https://github.com/harisyammnv/MicrosoftMalwareChallenge2018/blob/master/4.PNG) ![](https://github.com/harisyammnv/MicrosoftMalwareChallenge2018/blob/master/3.PNG)
 
-**Inference:** The optimal initial learning rate for densenet could be in the range marked by red dotted lines, but we selected `2e-2`. Generally the Learning rate is selected where there is maximum decrement of  loss function is observed 
+**Observation** The optimal initial learning rate for densenet could be in the range marked by red dotted lines, but we selected `2e-2`. Generally the Learning rate is selected where there is maximum decrement of  loss function is observed 
 
 ## 3) How should my classifier look like?
-Generally in the transfer learning tasks the Fully Connected classifier layers are ripped off and new FC layers are added to train on the new data and perform the new task. But many would generall stick with the conventional Linear and Dropout layers in the FC classifiers… Could we add some different layers? Yes we could, consider the following example where we added AdaptivePooling Layers in the new classifier
+Generally in the transfer learning tasks the Fully Connected (FC) classifier layers are ripped off and new FC layers are added to train on the new data and perform the new task. But many would generally stick with the conventional Linear and Dropout layers in the FC layers. Could we add some different layers? Yes we could, consider the following example where we added AdaptivePooling Layers in the new classifier
 
-	
 ~~~~
 class Flatten(nn.Module):
     def forward(self, input):
@@ -111,42 +111,21 @@ class ClassifierNew(nn.Module):
 ~~~~
 ![Lr12](https://github.com/harisyammnv/MicrosoftMalwareChallenge2018/blob/master/12.PNG)
 
-In the above example we have added AdaptiveMaxPool2d and AdaptiveAveragePool2d and flattened them out and concatenated them to form a linear layer of size `2* size(BatchNorm2d), for DenseNet161 the BacthNorm2d has a dimension of -1x2208x7x7 after passing them through the Pooling layers we obtain -1x2208x1x1 after Concatenation batch_size x 4416x1x1 and finally Flattening it into a Liner Layer of dimesnion -1x4416 then the Fully Connected part follows ` . Why we did this could be attributed to The Pooling layers because they capture richer features from the conv layers and we need to provide them as best as possible to the Classifier so they could classifiy easily and this would also effectively reduce the number of linear layers we need. This implementation is outlined is [fast.ai](https://www.fast.ai/) library, we just re-implemented it here.
+In the above example we have added AdaptiveMaxPool2d and AdaptiveAveragePool2d and flattened them out and concatenated them to form a linear layer of size `2* size(BatchNorm2d). For DenseNet161 the last BacthNorm2d layer has an output dimension of -1x2208x7x7 after passing them through the 2 Adaptive Pooling layers we obtain 2 output tensors of shape -1x2208x1x1. After concatenation of 2 tensors the shape is -1x4416x1x1 and finally flattening it into a Liner Layer of 4416 units then the Fully Connected part follows.` 
+
+**Reason:** Why we did this? It could be attributed to The Pooling layers because they capture richer features from the conv layers and we need to provide them as best as possible to the Classifier so they could classifiy easily and this would also effectively reduce the number of linear layers we need. This implementation is outlined is [fast.ai](https://www.fast.ai/) library, we just re-implemented it here.
 
 ## 4) Learning Rate Annealing / Scheduling
-The key idea here is to iteratively reduce the learning rate after every few epochs so that the optimizer would reach global/best local optima without any huge oscillations. The most popular form of learning rate annealing is a step decay where the learning rate is reduced by some percentage after a set number of training epochs. The other common scheduler is ReduceLRonPlateau. But here we would like to highlight a new one which was highlighted in [1] and was termed as cyclic learning rates.
+The key idea here is to iteratively reduce the learning rate after every few epochs so that the optimizer would reach global/best local optima without any huge oscillations. The most popular form of learning rate annealing is a step decay where the learning rate is reduced by some percentage after a set number of training epochs. The other common scheduler is ReduceLRonPlateau. But here we would like to highlight a new one which was highlighted in [1](https://arxiv.org/abs/1506.01186) and was termed as cyclic learning rates.
 
 ![Lr2](https://github.com/harisyammnv/MicrosoftMalwareChallenge2018/blob/master/2.PNG)
 
 [Image Credit](https://www.jeremyjordan.me/nn-learning-rate/)
 
-The intution behind why this learning rate annealing improves the val accuracy is outlined in [2]. An exemplary cyclicLR class is taken from [4] & [5] and is given below:
+The intution behind why this learning rate annealing improves the val accuracy is outlined in [2](https://www.jeremyjordan.me/nn-learning-rate/). An exemplary cyclicLR class is taken from [4](https://github.com/pytorch/pytorch/pull/2016) & [5](https://github.com/thomasjpfan/pytorch/blob/401ec389db2c9d2978917a6e4d1101b20340d7e7/torch/optim/lr_scheduler.py) and is given below:
 
 ~~~
 def cyclical_lr(step_sz, min_lr=0.001, max_lr=1, mode='triangular', scale_func=None, scale_md='cycles', gamma=1.):
-    """implements a cyclical learning rate policy (CLR).
-    Notes: the learning rate of optimizer should be 1
-
-    Parameters:
-    ----------
-    mode : str, optional
-        one of {triangular, triangular2, exp_range}. 
-    scale_md : str, optional
-        {'cycles', 'iterations'}.
-    gamma : float, optional
-        constant in 'exp_range' scaling function: gamma**(cycle iterations)
-    
-    Examples:
-    --------
-    >>> # the learning rate of optimizer should be 1
-    >>> optimizer = optim.SGD(model.parameters(), lr=1.)
-    >>> step_size = 2*len(train_loader)
-    >>> clr = cyclical_lr(step_size, min_lr=0.001, max_lr=0.005)
-    >>> scheduler = lr_scheduler.LambdaLR(optimizer, [clr])
-    >>> # some other operations
-    >>> scheduler.step()
-    >>> optimizer.step()
-    """
     if scale_func == None:
         if mode == 'triangular':
             scale_fn = lambda x: 1.
@@ -185,23 +164,30 @@ optimizer.step()
 ~~~
 
 ## 5) Optimizer
-After using the conventional Adam/SGD we had tried a new Optimizer which was cosine Cyclic Learning Rate annealing in combination with SGD which is termed Stochastic Gradient Descent with Restarts (SGDR) which proved to be better. SGDR is an aggressive annealing schedule which is combined with periodic "restarts" to the original starting learning rate. The LRsheduler for the Flower classification dataset looks as the one below and we used it from the [fast.ai](https://www.fast.ai/) library because - [SGDR](https://github.com/fastai/fastai/blob/master/old/fastai/sgdr.py)  it still an open request [6], [7], [8] in PyTorch:
-
-![Lr3](https://github.com/harisyammnv/MicrosoftMalwareChallenge2018/blob/master/6.PNG)
+After using the conventional Adam/SGD we had tried a new Optimizer which was cosine Cyclic Learning Rate annealing in combination with SGD which is termed Stochastic Gradient Descent with Restarts (SGDR) which proved to be better. SGDR is an aggressive annealing schedule which is combined with periodic "restarts" to the original starting learning rate. The LRsheduler for the Flower classification dataset looks as the one below and we used it from the [fast.ai](https://www.fast.ai/) library because - [SGDR](https://github.com/fastai/fastai/blob/master/old/fastai/sgdr.py)  is still an open request [6](https://github.com/pytorch/pytorch/issues/3790), [7](https://github.com/allenai/allennlp/issues/1642), [8](https://pytorch.org/docs/stable/optim.html#torch.optim.lr_scheduler.CosineAnnealingLR) in PyTorch:
 
 In Pytorch the Cosine Annealing Scheduler can be used as follows but it is without the restarts
 ~~~
 ## Only Cosine Annealing here
 torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max, eta_min=0, last_epoch=-1)
 ~~~
-To use this from fast.ai you just need to do as following:
+
+For the Flower dataset we used it from [fast.ai](https://www.fast.ai/) as following:
 ~~~
+# SGDR is implemented as the optimizer if the cycle_len flag is provided to the fit method
 learn.fit(lr, nr_of_epochs, cycle_len=1)
-# If Cycle Multipicity is needed
+~~~
+
+![Lr3](https://github.com/harisyammnv/MicrosoftMalwareChallenge2018/blob/master/6.PNG)
+
+~~~
+# SGDR + If Cycle Multipicity is needed
 learn.fit(lr, nr_of_epochs, cycle_len=1, cycle_mult = 2)
 ~~~
 The cycle multiplicity option in simpler words is basically increasing the LR decay over more number of epochs after every restart
 ![Lr4](https://github.com/harisyammnv/MicrosoftMalwareChallenge2018/blob/master/5.PNG)
+
+**Observation:** By using these techniques the Validation loss has reduced significantly in the flower dataset and thereby increasing the val accuracy 
 
 ## 6) Unfreezing layers selectively
 Have you ever wondered when you were at lesson 5.41 and 5.42 that you could unfreeze different layers of the model and train them again? Not? Me neither. :)
@@ -276,7 +262,7 @@ Why do we only decay the learning rate? is it also possible to decay weights? Ye
 
 ![Lr6](https://github.com/harisyammnv/MicrosoftMalwareChallenge2018/blob/master/8.PNG)
 
-But if we add L2 regularization terms to the cost function, Gradient descent on the updated cost function will lead us to a weight decay term which will penalizes large weights and effectively limits the freedom in your model. [9]
+But if we add L2 regularization terms to the cost function, Gradient descent on the updated cost function will lead us to a weight decay term which will penalizes large weights and effectively limits the freedom in your model [9](https://stats.stackexchange.com/questions/29130/difference-between-neural-net-weight-decay-and-learning-rate).
 The modified cost function and the modified weights update rule is given below
 
 ![Lr7](https://github.com/harisyammnv/MicrosoftMalwareChallenge2018/blob/master/10.PNG)
@@ -314,3 +300,4 @@ All in all, for us, this was quite a difficult topic to tackle as fine-tuning a 
 
 - https://github.com/masterflorin/PyTorchChallengeScholarship2018-19/blob/master/fine_tuning/fine_tuning.md
 - https://towardsdatascience.com/estimating-optimal-learning-rate-for-a-deep-neural-network-ce32f2556ce0
+- https://github.com/harisyammnv/PyTorchChallengeScholarship2018-19/blob/master/Pytorch_Challenge_Sample_Fastai.ipynb
