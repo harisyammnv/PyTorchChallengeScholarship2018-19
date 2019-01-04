@@ -269,9 +269,7 @@ torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-5)
 
 ## Final considerations
 All in all, for us, this was quite a difficult topic to tackle as fine-tuning a model is a very broad and challenging topic. Most of our efforts have been directed towards the Flower Classifier application as part of the PyTorch Challenge but some of the advice will certainly help you go further than that as they are pretty general. Through this, we hope that you found this article helpful. 
-
-Yours truly,
-Florin and Harisyam  
+ 
 
 ## Resources/links
 
