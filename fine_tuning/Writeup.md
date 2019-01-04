@@ -13,6 +13,9 @@
 
 
 ## Overview
+
+Before you start reading this article, we are assuming that you have already trained a pre-trained model and that you are looking for solutions on how to improve your model's ability to generalize. Let's begin!
+
 You trained your model on let’s say 20-30 epochs with some learning using Adam or SGD as an optimizer but your accuracy on the validation set stopped at 90% or below. What do you do? How do I get to that 98% or 99% accuracy? Is that even possible? Of course it is. Both Harry and I, hit the same wall as you did and fortunately we have managed to overcome the obstacle and got the best solution. In this article, we are going to teach you how to get to those magical results. In the following paragraphs we’re going to present you some of the things that will definitely help you fine-tune your model.
 
 ADD gif with MAGIC https://giphy.com/gifs/shia-labeouf-12NUbkX6p4xOO4
@@ -203,9 +206,11 @@ Now, I’m going to take a ResNet architecture, specifically ResNet152 to check 
 ~~~
 for name, child in model.named_children():
     print(name)
+~~~
 
-# It will print the names of the model components
+It will print the names of the model components
 
+~~~
 conv1
 bn1
 relu
@@ -216,7 +221,6 @@ layer3
 layer4
 avgpool
 fc
-
 ~~~
 
 We already know that in order to backpropagate through layers we have to set it to True
@@ -257,14 +261,17 @@ Image here
 But if we add L2 regularization terms to the cost function, Gradient descent on the updated cost function will lead us to a weight decay term which will penalizes large weights and effectively limits the freedom in your model. [9]
 Image here 
 
-In pytorch we could do it as below
+In pytorch we could do it as below:
 ~~~
 # similarly for SGD as well
 torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-5)
 ~~~
 
 ## Final considerations
+All in all, for us, this was quite a difficult topic to tackle as fine-tuning a model is a very broad and challenging topic. Most of our efforts have been directed towards the Flower Classifier application as part of the PyTorch Challenge but some of the advice will certainly help you go further than that as they are pretty general. Through this, we hope that you found this article helpful. 
 
+Yours truly,
+Florin and Harisyam  
 
 ## Resources/links
 
