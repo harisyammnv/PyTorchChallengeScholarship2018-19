@@ -102,7 +102,9 @@ class ClassifierNew(nn.Module):
         return x
 	
 ~~~~
-In the above example we have added AdaptiveMaxPool2d and AdaptiveAveragePool2d and flattened them out and concatenated them to form a linear layer of size 4416. Why we did this could be attributed to The Pooling layers because they capture richer features from the conv layers and we need to provide them as best as possible to the Classifier so they could classifiy easily and this would also effectively reduce the number of linear layers we need. This implementation is outlined is [fast.ai](https://www.fast.ai/) library, we just re-implemented it here.
+![Lr12](https://github.com/harisyammnv/MicrosoftMalwareChallenge2018/blob/master/12.PNG)
+
+In the above example we have added AdaptiveMaxPool2d and AdaptiveAveragePool2d and flattened them out and concatenated them to form a linear layer of size `2* size(BatchNorm2d), for DenseNet161 the BacthNorm2d has a dimension of -1x2208x7x7 after passing them through the Pooling layers we obtain -1x2208x1x1 after Concatenation batch_size x 4416x1x1 and finally Flattening it into a Liner Layer of dimesnion -1x4416 then the Fully Connected part follows ` . Why we did this could be attributed to The Pooling layers because they capture richer features from the conv layers and we need to provide them as best as possible to the Classifier so they could classifiy easily and this would also effectively reduce the number of linear layers we need. This implementation is outlined is [fast.ai](https://www.fast.ai/) library, we just re-implemented it here.
 
 ## 4) Learning Rate Annealing / Scheduling
 The key idea here is to iteratively reduce the learning rate after every few epochs so that the optimizer would reach global/best local optima without any huge oscillations. The most popular form of learning rate annealing is a step decay where the learning rate is reduced by some percentage after a set number of training epochs. The other common scheduler is ReduceLRonPlateau. But here we would like to highlight a new one which was highlighted in [1] and was termed as cyclic learning rates.
