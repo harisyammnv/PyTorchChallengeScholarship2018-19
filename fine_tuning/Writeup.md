@@ -111,7 +111,15 @@ class ClassifierNew(nn.Module):
 ~~~~
 ![Lr12](https://github.com/harisyammnv/MicrosoftMalwareChallenge2018/blob/master/12.PNG)
 
-In the above example we have added AdaptiveMaxPool2d and AdaptiveAveragePool2d and flattened them out and concatenated them to form a linear layer of size `2* size(BatchNorm2d). For DenseNet161 the last BacthNorm2d layer has an output dimension of -1x2208x7x7 after passing them through the 2 Adaptive Pooling layers we obtain 2 output tensors of shape -1x2208x1x1. After concatenation of 2 tensors the shape is -1x4416x1x1 and finally flattening it into a Liner Layer of 4416 units then the Fully Connected part follows.` 
+In the above example we have added AdaptiveMaxPool2d and AdaptiveAveragePool2d and flattened them out and concatenated them to form a linear layer of size `-1 x 2* size(Last BatchNorm2d Layer)`. 
+
+For example in `DenseNet161`:
+- The last BacthNorm2d layer has an output dimension of `-1x2208x7x7`  
+- After passing the mini-batch through the 2 Adaptive Pooling layers we obtain 2 output tensors of shape `-1x2208x1x1` 
+- Concatenation of the above 2 tensors would result in a tensor of shape `-1x4416x1x1`  
+- Finally flattening the tensor of shape `-1x4416x1x1` would result a Liner Layer of `-1x4416` i.e `(-1x2*(2208))`
+- This layer is then connected to the Fully Connected part
+- ***Note:*** -1 in the above tensor shapes should be replaced with the mini-batch size
 
 **Reason:** Why we did this? It could be attributed to The Pooling layers because they capture richer features from the conv layers and we need to provide them as best as possible to the Classifier so they could classifiy easily and this would also effectively reduce the number of linear layers we need. This implementation is outlined is [fast.ai](https://www.fast.ai/) library, we just re-implemented it here.
 
